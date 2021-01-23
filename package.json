@@ -1,0 +1,11 @@
+{
+  "name": "onepiece-webscraping",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "apify": "^0.21.9",
+    "apify-cli": "^0.6.1",
+    "puppeteer": "^5.5.0"
+  }
+}
