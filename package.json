@@ -6,6 +6,10 @@
   "dependencies": {
     "apify": "^0.21.9",
     "apify-cli": "^0.6.1",
+    "axios": "^0.21.1",
+    "images-downloader": "^1.0.3",
+    "json-server": "^0.16.3",
+    "node-image-downloader": "^1.0.7",
     "puppeteer": "^5.5.0"
   }
 }

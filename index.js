@@ -1,45 +1,44 @@
 const puppeteer = require('puppeteer');
 const path = require("path");
-const Download = require('./download');
 const fileSystem = require("fs");
+const Download = require('./utils/download');
+const waitForNavigation = require("./utils/waitForNavigation");
 
-function getFilepath(chapter) {
+function filePath(chapter, page) {
   const directory = `./downloads/${chapter}`
 
   if (!fileSystem.existsSync(directory))
     fileSystem.mkdirSync(directory);
 
-  const filepath = path.resolve(__dirname, directory);
+  const filepath = path.resolve(__dirname, directory, `${page}.png`);
 
   return filepath;
 }
+
 
 async function run(chapter) {
   console.log(`[One Piece Downloader] - Downloading chapter ${chapter} ...`);
 
   const browser = await puppeteer.launch();
+  
+  const page = await browser.newPage();
+  
+  await page.setDefaultNavigationTimeout(0); 
+  
+  await page.goto(`https://onepieceex.net/mangas/leitor/${chapter}/#1`);
+  
+  const numberOfPages = await page.$$("#mangapaginas li");
 
-  const IMAGE_SELECTOR = '#leitor-opex .center .paginamanga';
+  for(let currentPage = 1; currentPage < numberOfPages.length; currentPage++) {
+    await Promise.all([
+      page.click(`.pagina-${currentPage}`),
 
-  for(let pageNumber = 1; pageNumber < 25; pageNumber++) {
-    const page = await browser.newPage();
-
-    await page.goto(`https://onepieceex.net/mangas/leitor/${chapter}/#${pageNumber}`);
-
-    const imageSource = await page.$eval(IMAGE_SELECTOR, image => image.src);
-
-    const vectorImageSource = imageSource.split("/");
-
-    const fileName = vectorImageSource[vectorImageSource.length - 1];
-
-    const cannotDownload = fileName === "z.jpg" || fileName === "loading.gif";
-
-    if(cannotDownload) process.exit();
-
-    else {
-      Download(imageSource, getFilepath(chapter) ,function() {
-      });
-    }
+      waitForNavigation(page, 250)
+    ]);
+  
+    const imageSource = await page.$eval('#leitor-opex .center a img', image => image.src);
+    
+    await Download(imageSource, filePath(chapter, currentPage))
   }
 
   browser.close();
