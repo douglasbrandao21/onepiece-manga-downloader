@@ -3,9 +3,10 @@ const path = require("path");
 const fileSystem = require("fs");
 const Download = require('./utils/download');
 const waitForNavigation = require("./utils/waitForNavigation");
+const chapters = require("./utils/chapters");
 
 function filePath(chapter, page) {
-  const directory = `./downloads/${chapter}`
+  const directory = `./downloads/${chapters[chapter-1]}`;
 
   if (!fileSystem.existsSync(directory))
     fileSystem.mkdirSync(directory);
@@ -17,7 +18,7 @@ function filePath(chapter, page) {
 
 
 async function run(chapter) {
-  console.log(`[One Piece Downloader] - Downloading chapter ${chapter} ...`);
+  console.log(`[One Piece Downloader] - Downloading ${chapters[chapter-1]} ...`);
 
   const browser = await puppeteer.launch();
   
